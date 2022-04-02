@@ -1,6 +1,7 @@
-import { ChangeEvent, useState } from 'react'
+import { ChangeEvent, useEffect, useState } from 'react'
 import { GetServerSideProps, NextPage } from 'next'
 import {
+  Button,
   Card,
   CardContent,
   FormControl,
@@ -10,6 +11,7 @@ import {
   RadioGroup,
 } from '@mui/material'
 import Cookies from 'js-cookie'
+import axios from 'axios'
 
 import { Layout } from '../components/layouts'
 
@@ -24,6 +26,16 @@ const ThemeChangerPage: NextPage = (props) => {
 
     Cookies.set('theme', selectedTheme)
   }
+
+  const onClick = async () => {
+    const { data } = await axios.get('/api/hello')
+    console.log('🚀 ~ file: theme-changer.tsx ~ line 32 ~ onClick ~ resp', data)
+  }
+
+  useEffect(() => {
+    console.log('LocalStorage:', localStorage.getItem('theme'))
+    console.log('Cookies:', Cookies.get('theme'))
+  }, [])
 
   return (
     <Layout>
@@ -49,6 +61,7 @@ const ThemeChangerPage: NextPage = (props) => {
               />
             </RadioGroup>
           </FormControl>
+          <Button onClick={onClick}>Request</Button>
         </CardContent>
       </Card>
     </Layout>

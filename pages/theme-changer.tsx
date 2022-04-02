@@ -15,9 +15,18 @@ import axios from 'axios'
 
 import { Layout } from '../components/layouts'
 
-const ThemeChangerPage: NextPage = (props) => {
-  console.log('🚀 ~ file: theme-changer.tsx ~ line 17 ~ props', props)
-  const [currentTheme, setCurrentTheme] = useState('light')
+export enum Themes {
+  LIGHT = 'light',
+  DARK = 'dark',
+  CUSTOM = 'custom',
+}
+
+interface Props {
+  theme: string
+}
+
+const ThemeChangerPage: NextPage<Props> = ({ theme }) => {
+  const [currentTheme, setCurrentTheme] = useState(theme)
 
   const onThemeChange = (event: ChangeEvent<HTMLInputElement>) => {
     const selectedTheme = event.target.value
@@ -33,8 +42,7 @@ const ThemeChangerPage: NextPage = (props) => {
   }
 
   useEffect(() => {
-    console.log('LocalStorage:', localStorage.getItem('theme'))
-    console.log('Cookies:', Cookies.get('theme'))
+    setCurrentTheme(Cookies.get('theme') || Themes.LIGHT)
   }, [])
 
   return (
@@ -45,17 +53,17 @@ const ThemeChangerPage: NextPage = (props) => {
             <FormLabel>Theme</FormLabel>
             <RadioGroup value={currentTheme} onChange={onThemeChange}>
               <FormControlLabel
-                value={'light'}
+                value={Themes.LIGHT}
                 control={<Radio />}
                 label="Light"
               />
               <FormControlLabel
-                value={'dark'}
+                value={Themes.DARK}
                 control={<Radio />}
                 label="Dark"
               />
               <FormControlLabel
-                value={'custom'}
+                value={Themes.CUSTOM}
                 control={<Radio />}
                 label="Custom"
               />
@@ -69,11 +77,13 @@ const ThemeChangerPage: NextPage = (props) => {
 }
 
 export const getServerSideProps: GetServerSideProps = async ({ req }) => {
-  const { theme = 'light' } = req.cookies
+  const { theme = Themes.LIGHT } = req.cookies
+
+  const validThemes: string[] = Object.values(Themes).map((theme) => theme)
 
   return {
     props: {
-      theme,
+      theme: validThemes.includes(theme) ? theme : Themes.DARK,
     },
   }
 }

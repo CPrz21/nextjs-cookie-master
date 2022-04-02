@@ -1,6 +1,5 @@
 import { ChangeEvent, useState } from 'react'
-import { Layout } from '../components/layouts'
-
+import { GetServerSideProps, NextPage } from 'next'
 import {
   Card,
   CardContent,
@@ -10,15 +9,20 @@ import {
   Radio,
   RadioGroup,
 } from '@mui/material'
-import { NextPage } from 'next'
+import Cookies from 'js-cookie'
 
-const ThemeChangerPage: NextPage = () => {
+import { Layout } from '../components/layouts'
+
+const ThemeChangerPage: NextPage = (props) => {
+  console.log('🚀 ~ file: theme-changer.tsx ~ line 17 ~ props', props)
   const [currentTheme, setCurrentTheme] = useState('light')
 
   const onThemeChange = (event: ChangeEvent<HTMLInputElement>) => {
     const selectedTheme = event.target.value
 
     setCurrentTheme(selectedTheme)
+
+    Cookies.set('theme', selectedTheme)
   }
 
   return (
@@ -49,6 +53,16 @@ const ThemeChangerPage: NextPage = () => {
       </Card>
     </Layout>
   )
+}
+
+export const getServerSideProps: GetServerSideProps = async ({ req }) => {
+  const { theme = 'light' } = req.cookies
+
+  return {
+    props: {
+      theme,
+    },
+  }
 }
 
 export default ThemeChangerPage
